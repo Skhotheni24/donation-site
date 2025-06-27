@@ -35,7 +35,10 @@ exports.handler = async function (event) {
     });
 
     await client.authorize();
-    await doc.useJwtAuth(client);
+    await doc.useServiceAccountAuth({
+      client_email: credentials.client_email,
+      private_key: credentials.private_key,
+    });
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
     await sheet.addRow({ Name: name, Email: email, Amount: amount, Story: story });
