@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+console.log("✅ submit-form function triggered");
 
 exports.handler = async function(event, context) {
   if (event.httpMethod !== "POST") {
