@@ -1,1 +1,56 @@
-<html><body><h1>Donation Site Placeholder</h1></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donate</title>
+</head>
+<body>
+  <h1>Request a Donation</h1>
+  <form id="donation-form">
+    <label>Name: <input type="text" name="name" required></label><br>
+    <label>Email: <input type="email" name="email" required></label><br>
+    <label>Donation Bracket:
+      <select name="amount">
+        <option value="$0 - $2000">$0 - $2000</option>
+        <option value="$2000 - $5000">$2000 - $5000</option>
+        <option value="$5000 - $10000">$5000 - $10000</option>
+        <option value="$10000+">$10000+</option>
+      </select>
+    </label><br>
+    <label>Your Story:<br>
+      <textarea name="story" rows="5" cols="40" required></textarea>
+    </label><br>
+    <button type="submit">Submit</button>
+  </form>
+  <p id="response"></p>
+
+  <script>
+    document.getElementById("donation-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        amount: form.amount.value,
+        story: form.story.value,
+      };
+
+      try {
+        const res = await fetch("/.netlify/functions/submit-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        document.getElementById("response").innerText = result.message || "Success!";
+        form.reset();
+      } catch (err) {
+        console.error("Submission error:", err);
+        document.getElementById("response").innerText = "There was an error submitting your form.";
+      }
+    });
+  </script>
+</body>
+</html>
