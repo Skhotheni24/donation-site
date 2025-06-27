@@ -36,8 +36,8 @@ exports.handler = async function (event) {
 
     await client.authorize();
     await doc.useServiceAccountAuth({
-      client_email: credentials.client_email,
-      private_key: credentials.private_key,
+      client_email: creds.client_email,
+      private_key: creds.private_key,
     });
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
