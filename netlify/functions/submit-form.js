@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 const { JWT } = require("google-auth-library");
 const { GoogleSpreadsheet } = require("google-spreadsheet");
-console.log("Parsed formData:", formData);
 
 exports.handler = async function (event) {
   try {
