@@ -1,72 +1,60 @@
+
 const nodemailer = require('nodemailer');
+const { JWT } = require('google-auth-library');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-console.log("✅ submit-form function triggered");
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS length:", process.env.EMAIL_PASS?.length);
 
-exports.handler = async function(event, context) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const SHEET_ID = process.env.SHEET_ID;
 
-  let data;
+exports.handler = async function(event) {
+  console.log("✅ submit-form function triggered");
   try {
-    data = JSON.parse(event.body);
-  } catch (e) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid JSON input" })
-    };
-  }
+    const body = JSON.parse(event.body);
+    const { name, email, amount, story } = body;
 
-  const { name = "", email = "", reason = "", story = "", bracket = "" } = data;
-
-  if (!name || !email || !reason || !story || !bracket) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "All fields are required" })
-    };
-  }
-
-  try {
+    // Send Email
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: 'generic.yes@hotmail.com',
-      subject: 'New Financial Assistance Request',
-      html: `
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Reason:</strong> ${reason}</p>
-        <p><strong>Donation Bracket:</strong> ${bracket}</p>
-        <p><strong>Story:</strong><br>${story}</p>
-      `
+      from: EMAIL_USER,
+      to: EMAIL_USER,
+      subject: "New Donation Request",
+      text: \`Name: \${name}\nEmail: \${email}\nAmount: \${amount}\nStory: \${story}\`,
     });
-  } catch (error) {
-    console.error("Email error:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: "Failed to send email" }) };
-  }
 
-  try {
-    const doc = new GoogleSpreadsheet(process.env.SHEET_ID);
-    await doc.useServiceAccountAuth({
-      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    // Write to Google Sheet
+    const credsJSON = Buffer.from(process.env.GOOGLE_CREDENTIALS, 'base64').toString('utf-8');
+    const creds = JSON.parse(credsJSON);
+
+    const doc = new GoogleSpreadsheet(SHEET_ID);
+    const client = new JWT({
+      email: creds.client_email,
+      key: creds.private_key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
+
+    await client.authorize();
+    await doc.useJwtAuth(client);
     await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
-    await sheet.addRow({ Name: name, Email: email, Reason: reason, Bracket: bracket, Story: story });
-  } catch (error) {
-    console.error("Google Sheet error:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: "Failed to log to Google Sheet" }) };
-  }
+    await sheet.addRow({ Name: name, Email: email, Amount: amount, Story: story });
 
-  return { statusCode: 200, body: JSON.stringify({ message: "Success" }) };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Success" }),
+    };
+  } catch (err) {
+    console.error("Function error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Error", error: err.message }),
+    };
+  }
 };
