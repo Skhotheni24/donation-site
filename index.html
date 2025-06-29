@@ -2,78 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Request Financial Assistance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donation Recipient Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-    .container { max-width: 800px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-    h1 { text-align: center; color: #333; }
-    form { display: flex; flex-direction: column; }
-    label { margin: 10px 0 5px; font-weight: bold; }
-    input, textarea, select { padding: 10px; font-size: 1rem; margin-bottom: 20px; border: 1px solid #ccc;
-      border-radius: 5px; }
-    button { padding: 10px; font-size: 1rem; background-color: #28a745; color: white;
-      border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #218838; }
-    .submission-message { display: none; text-align: center; color: green; margin-top: 20px; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: url('https://images.unsplash.com/photo-1508780709619-79562169bc64?fit=crop&w=1950&q=80') center/cover no-repeat;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: inline-block;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    form {
+      background-color: #1e293b;
+      padding: 2rem;
+      border-radius: 1rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    form h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: #60a5fa;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background-color: #334155;
+      color: white;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      background-color: #3b82f6;
+      color: white;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    footer {
+      text-align: right;
+      padding: 1rem 2rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Request Financial Assistance</h1>
-    <form id="donationRequestForm">
-      <label for="name">Your Name</label>
-      <input type="text" id="name" name="name" required>
-      <label for="email">Your Email</label>
-      <input type="email" id="email" name="email" required>
-      <label for="reason">Reason for Assistance</label>
-      <input type="text" id="reason" name="reason" required>
+  <header>
+    <h1>Request a Donation</h1>
+  </header>
+  <main>
+    <form name="donation-form" method="POST" netlify netlify-honeypot="bot-field" action="/success">
+      <h2>Tell Us Your Story</h2>
+      <input type="hidden" name="form-name" value="donation-form" />
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" placeholder="Jane Doe" required />
+
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" required />
+
+      <label for="reason">Reason for Request</label>
+      <input type="text" id="reason" name="reason" placeholder="Medical, education, etc." required />
+
       <label for="story">Your Story</label>
-      <textarea id="story" name="story" rows="6" required></textarea>
-      <label for="bracket">Donation Bracket</label>
-      <select id="bracket" name="bracket" required>
-        <option value="$0-$2000">$0 – $2,000</option>
-        <option value="$2000-$5000">$2,000 – $5,000</option>
-        <option value="$5000-$10000">$5,000 – $10,000</option>
-        <option value="above-$10000">More than $10,000</option>
-      </select>
+      <textarea id="story" name="story" placeholder="Tell us more..." rows="5" required></textarea>
+
       <button type="submit">Submit Request</button>
     </form>
-    <div class="submission-message" id="submissionMessage">
-      Thank you for your submission. We'll review your request shortly.
-    </div>
-  </div>
-  <script>
-    const form = document.getElementById('donationRequestForm');
-    const message = document.getElementById('submissionMessage');
-    form.addEventListener('submit', async function(event) {
-      event.preventDefault();
-      const formData = {
-        name: form.name.value,
-        email: form.email.value,
-        reason: form.reason.value,
-        story: form.story.value,
-        bracket: form.bracket.value
-      };
-      try {
-        const response = await fetch('/.netlify/functions/submit-form', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        if (response.ok) {
-          form.style.display = 'none';
-          message.style.display = 'block';
-        } else {
-          const errorText = await response.text();
-          alert("Error: " + errorText);
-        }
-      } catch (error) {
-        console.error('Submission error:', error);
-        alert("Submission failed. Please try again later.");
-      }
-    });
-  </script>
+  </main>
+  <footer>
+    <em>"With man this is impossible, but with God all things are possible." — Matthew 19:26</em>
+  </footer>
 </body>
 </html>
