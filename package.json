@@ -1,8 +1,11 @@
 {
   "name": "donation-site",
   "version": "1.0.0",
-  "dependencies": {
-    "nodemailer": "^6.9.0",
-    "google-spreadsheet": "^3.3.0"
+  "main": "index.js",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "devDependencies": {
+    "netlify-cli": "^13.0.0"
   }
 }

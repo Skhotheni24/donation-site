@@ -1,54 +1,25 @@
-const nodemailer = require("nodemailer");
-const { GoogleSpreadsheet } = require("google-spreadsheet");
-
-exports.handler = async function (event) {
+exports.handler = async function(event, context) {
   try {
-    const body = JSON.parse(event.body);
-    const { name, email, reason, bracket, story } = body;
+    const data = JSON.parse(event.body);
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    console.log("Received data:", data);
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      subject: "New Donation Request",
-      text: `Name: ${name}\nEmail: ${email}\nReason: ${reason}\nBracket: ${bracket}\nStory: ${story}`,
-    });
-
-    const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS, "base64").toString("utf-8");
-    const creds = JSON.parse(decoded);
-
-    const doc = new GoogleSpreadsheet(process.env.SHEET_ID);
-    await doc.useServiceAccountAuth({
-      client_email: creds.client_email,
-      private_key: creds.private_key,
-    });
-
-    await doc.loadInfo();
-    const sheet = doc.sheetsByIndex[0];
-    await sheet.addRow({
-      Name: name,
-      Email: email,
-      Reason: reason,
-      Bracket: bracket,
-      Story: story,
-    });
+    if (!data.name || !data.email || !data.reason || !data.bracket || !data.story) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing required fields" })
+      };
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Success" }),
+      body: JSON.stringify({ message: "Form submission successful" })
     };
-  } catch (err) {
-    console.error("Function error:", err);
+  } catch (error) {
+    console.error("Form submission error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Error", error: err.message }),
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
