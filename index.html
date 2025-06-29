@@ -97,7 +97,7 @@
     <h1>Request a Donation</h1>
   </header>
   <main>
-    <form name="donation-form" method="POST" netlify netlify-honeypot="bot-field" action="#" id="donation-form">
+    <form name="donation-form" method="POST" netlify netlify-honeypot="bot-field" action="/success">
       <h2>Tell Us Your Story</h2>
       <input type="hidden" name="form-name" value="donation-form" />
       <label for="name">Full Name</label>
@@ -127,30 +127,5 @@
   <footer>
     <em>"With man this is impossible, but with God all things are possible." — Matthew 19:26</em>
   </footer>
-
-<div id="confirmation-box" class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg hidden">
-  Thank you! Your submission has been received.
-</div>
-
-<script>
-document.getElementById("donation-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
-
-  const response = await fetch("/.netlify/functions/submit-form", {
-    method: "POST",
-    body: new URLSearchParams(formData)
-  });
-
-  if (response.ok) {
-    document.getElementById("confirmation-box").classList.remove("hidden");
-    form.reset();
-  } else {
-    alert("There was an error submitting the form.");
-  }
-});
-</script>
-
 </body>
 </html>
