@@ -1,63 +1,131 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Donation Request</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donation Recipient Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: url('https://images.unsplash.com/photo-1508780709619-79562169bc64?fit=crop&w=1950&q=80') center/cover no-repeat;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: inline-block;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    form {
+      background-color: #1e293b;
+      padding: 2rem;
+      border-radius: 1rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    form h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: #60a5fa;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background-color: #334155;
+      color: white;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      background-color: #3b82f6;
+      color: white;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    footer {
+      text-align: right;
+      padding: 1rem 2rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+  </style>
 </head>
-<body style="font-family:sans-serif; background-color:#111827; color:white; padding:2rem;">
-  <h1>Request a Donation</h1>
-  <form name="donation-request">
-    <label>Name: <input type="text" name="name" required></label><br/><br/>
-    <label>Email: <input type="email" name="email" required></label><br/><br/>
-    <label>Donation Bracket (AUD): 
-      <select name="bracket" required>
+<body>
+  <header>
+    <h1>Request a Donation</h1>
+  </header>
+  <main>
+    <form name="donation-form" method="POST" netlify netlify-honeypot="bot-field" >
+      <h2>Tell Us Your Story</h2>
+      <input type="hidden" name="form-name" value="donation-form" />
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" placeholder="Jane Doe" required />
+
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" required />
+
+      <label for="bracket">Donation Bracket (AUD)</label>
+      <select id="bracket" name="bracket" required>
         <option value="">Select a bracket</option>
-        <option value="$0–$500">$0–$500</option>
-        <option value="$500–$2000">$500–$2000</option>
-        <option value="$2000–$5000">$2000–$5000</option>
-        <option value="$5000+">$5000+</option>
+        <option value="0–500">AUD 0–500</option>
+        <option value="500–2000">AUD 500–2000</option>
+        <option value="2000–5000">AUD 2000–5000</option>
+        <option value="5000+">AUD 5000+</option>
       </select>
-    </label><br/><br/>
-    <label>Reason for Request:<br/>
-      <textarea name="reason" required rows="3" cols="30"></textarea>
-    </label><br/><br/>
-    <label>Your Story:<br/>
-      <textarea name="story" required rows="5" cols="30"></textarea>
-    </label><br/><br/>
-    <button type="submit">Submit Request</button>
-  </form>
-  <div id="confirmation" style="display:none; color:lightgreen; margin-top:1rem;">
-    Your request has been submitted successfully!
-  </div>
-  <script>
-    const form = document.querySelector("form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = {
-        name: form.name.value,
-        email: form.email.value,
-        bracket: form.bracket.value,
-        reason: form.reason.value,
-        story: form.story.value,
-      };
-      try {
-        const response = await fetch("/.netlify/functions/submit-form", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result = await response.json();
-        if (response.ok) {
-          document.getElementById("confirmation").style.display = "block";
-          form.reset();
-        } else {
-          alert("Submission failed: " + result.error);
-        }
-      } catch (err) {
-        alert("An error occurred: " + err.message);
-      }
-    });
-  </script>
+
+      <label for="reason">Reason for Request</label>
+      <input type="text" id="reason" name="reason" placeholder="Medical, education, etc." required />
+
+      <label for="story">Your Story</label>
+      <textarea id="story" name="story" placeholder="Tell us more..." rows="5" required></textarea>
+
+      <button type="submit">Submit Request</button>
+    </form>
+  </main>
+  <footer>
+    <em>"With man this is impossible, but with God all things are possible." — Matthew 19:26</em>
+  </footer>
 </body>
 </html>
