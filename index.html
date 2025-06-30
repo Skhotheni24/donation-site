@@ -149,7 +149,7 @@
         });
         const result = await response.json();
         if (response.ok) {
-          alert("Thank you! Your donation request was submitted.");
+          alert("Thank you! Your donation request was submitted. If selected, you will be contacted via your provided email address");
           form.reset();
         } else {
           alert("Submission failed: " + result.error);
